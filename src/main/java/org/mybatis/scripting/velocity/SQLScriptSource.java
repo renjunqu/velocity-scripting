@@ -31,9 +31,14 @@ public class SQLScriptSource implements SqlSource {
 
   private static int templateIndex = 0;
 
-  private final ParameterMapping[] parameterMappingSources;
+
+
+
+  private  ParameterMapping[] parameterMappingSources;
   private final Object compiledScript;
   private final Configuration configuration;
+
+
 
   public SQLScriptSource(Configuration configuration, String script, Class<?> parameterTypeClass) {
     this.configuration = configuration;
@@ -43,25 +48,75 @@ public class SQLScriptSource implements SqlSource {
     compiledScript = VelocityFacade.compile(script, "velocity-template-" + (++templateIndex));
   }
 
-  @Override
-  public BoundSql getBoundSql(Object parameterObject) {
 
-    final Map<String, Object> context = new HashMap<String, Object>();
-    final ParameterMappingCollector pmc = new ParameterMappingCollector(parameterMappingSources, context, configuration);
+
+
+
+  public BoundSql getBoundSql(Object parameterObject,Map<String,Object>contextRet) {
+
+    Map<String, Object> context = new HashMap<String, Object>();
+    ParameterMappingCollector pmc = new ParameterMappingCollector(parameterMappingSources, context, configuration);
 
     context.put(DATABASE_ID_KEY, configuration.getDatabaseId());
     context.put(PARAMETER_OBJECT_KEY, parameterObject);
     context.put(MAPPING_COLLECTOR_KEY, pmc);
     context.put(VARIABLES_KEY, configuration.getVariables());
 
+
     final String sql = VelocityFacade.apply(compiledScript, context);
-    BoundSql boundSql = new BoundSql(configuration, sql, pmc.getParameterMappings(), parameterObject);
+    //System.out.println("sql is "+sql);
+    //这个parameterObject 实际上就是在xml中指定的parameterType带进去的那个变量
+    contextRet.put(MAPPING_COLLECTOR_KEY,pmc);
+    BoundSql boundSql = new BoundSql(configuration, sql, pmc.getParameterMappings(),parameterObject);
+    //System.out.println("hello soda1");
     for (Map.Entry<String, Object> entry : context.entrySet()) {
       boundSql.setAdditionalParameter(entry.getKey(), entry.getValue());
     }
-
+    //System.out.println("bound sql is "+boundSql.getSql());
     return boundSql;
 
   }
+
+
+  @Override
+  public BoundSql getBoundSql(Object parameterObject) {
+
+    Map<String, Object> context = new HashMap<String, Object>();
+    System.out.println("parameterMappingSources is " + parameterMappingSources);
+    ParameterMappingCollector pmc = new ParameterMappingCollector(parameterMappingSources, context, configuration);
+
+
+
+    //made by renjunqu
+    context.put("sqlSource",this);
+    //over
+    context.put("contextRoot",context);
+    context.put(DATABASE_ID_KEY, configuration.getDatabaseId());
+    context.put(PARAMETER_OBJECT_KEY, parameterObject);
+    context.put(MAPPING_COLLECTOR_KEY, pmc);
+    context.put(VARIABLES_KEY, configuration.getVariables());
+
+
+    System.out.println("hello soda");
+    final String sql = VelocityFacade.apply(compiledScript, context);
+    System.out.println("sql is "+sql);
+    //这个parameterObject 实际上就是在xml中指定的parameterType带进去的那个变量
+    //有可能已经被修改了
+    pmc = (ParameterMappingCollector)context.get(MAPPING_COLLECTOR_KEY);
+    BoundSql boundSql = new BoundSql(configuration, sql, pmc.getParameterMappings(),parameterObject);
+    //System.out.println("hello soda1");
+    for (Map.Entry<String, Object> entry : context.entrySet()) {
+      //System.out.println("key is "+entry.getKey()+" value is "+entry.getValue());
+      boundSql.setAdditionalParameter(entry.getKey(), entry.getValue());
+    }
+    //System.out.println("bound sql is "+boundSql.getSql());
+    return boundSql;
+
+  }
+
+  public Configuration getConfiguration(){
+    return this.configuration;
+  }
+
 
 }

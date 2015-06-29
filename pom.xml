@@ -20,11 +20,11 @@
   <parent>
     <groupId>org.mybatis</groupId>
     <artifactId>mybatis-parent</artifactId>
-    <version>24-SNAPSHOT</version>
+    <version>24</version>
   </parent>
 
   <groupId>org.mybatis.scripting</groupId>
-  <artifactId>mybatis-velocity</artifactId>
+  <artifactId>mybatis-velocity-haha</artifactId>
   <version>1.2-SNAPSHOT</version>
   <packaging>jar</packaging>
 
