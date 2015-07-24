@@ -91,6 +91,7 @@ public class RepeatDirective extends Directive {
   public boolean render(InternalContextAdapter context, Writer writer, Node node)
       throws IOException, ResourceNotFoundException, ParseErrorException, MethodInvocationException {
 
+    Node node_c =node.jjtGetChild(0);
     Object listObject = node.jjtGetChild(0).value(context);
 
     if (listObject == null) {
@@ -117,10 +118,14 @@ public class RepeatDirective extends Directive {
     boolean maxNbrLoopsExceeded = false;
     Object o = context.get(var);
 
+    /*
+    mybatis 相关的内容~~~~ 看看注释掉能不能成功~~~
     ParameterMappingCollector collector = (ParameterMappingCollector) context.get(SQLScriptSource.MAPPING_COLLECTOR_KEY);
     String savedItemKey = collector.getItemKey();
     collector.setItemKey(var);
+    */
     RepeatScope foreach = new RepeatScope(this, context.get(getName()), var);
+
     context.put(getName(), foreach);
 
     NullHolderContext nullHolderContext = null;
@@ -141,12 +146,14 @@ public class RepeatDirective extends Directive {
           node.jjtGetChild(node.jjtGetNumChildren()-1).render(context, buffer);
         }
       } catch (StopCommand stop) {
+
         if (stop.isFor(this)) {
           break;
         } else {
-          clean(context, o, collector, savedItemKey);
+        //  clean(context, o, collector, savedItemKey);
           throw stop;
         }
+
       }
 
       counter++;
@@ -163,7 +170,7 @@ public class RepeatDirective extends Directive {
       writer.append(content);
       writer.append(close);
     }
-    clean(context, o, collector, savedItemKey);
+    //clean(context, o, collector, savedItemKey);
     return true;
 
   }

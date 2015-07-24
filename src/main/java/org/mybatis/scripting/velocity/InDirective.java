@@ -116,9 +116,11 @@ public class InDirective extends RepeatDirective {
     int counter = 0;
     Object o = context.get(this.var);
 
+    /*
     ParameterMappingCollector collector = (ParameterMappingCollector) context.get(SQLScriptSource.MAPPING_COLLECTOR_KEY);
     String savedItemKey = collector.getItemKey();
     collector.setItemKey(this.var);
+    */
     RepeatScope foreach = new RepeatScope(this, context.get(getName()), var);
     context.put(getName(), foreach);
 
@@ -152,11 +154,12 @@ public class InDirective extends RepeatDirective {
         }
       }
       catch (StopCommand stop) {
+
         if (stop.isFor(this)) {
           break;
         }
         else {
-          clean(context, o, collector, savedItemKey);
+        //  clean(context, o, collector, savedItemKey);
           throw stop;
         }
       }
@@ -180,7 +183,7 @@ public class InDirective extends RepeatDirective {
       writer.append(content);
       writer.append(this.close);
     }
-    clean(context, o, collector, savedItemKey);
+   // clean(context, o, collector, savedItemKey);
     return true;
   }
 
