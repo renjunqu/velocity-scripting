@@ -31,6 +31,8 @@ import org.apache.velocity.util.StringUtils;
 
 public class VelocityFacade {
 
+
+
   private static final String ADDITIONAL_CTX_ATTRIBUTES_KEY = "additional.context.attributes";
   private static final String EXTERNAL_PROPERTIES = "mybatis-velocity.properties";
   private static final String DIRECTIVES = TrimDirective.class.getName() 
