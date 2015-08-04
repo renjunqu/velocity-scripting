@@ -48,7 +48,7 @@ public class VelocityFacade {
   private static final Properties settings;
 
   static {
-
+   // System.out.println("velocity start to load properties");
 	settings = loadProperties();
     additionalCtxAttributes = Collections.unmodifiableMap(loadAdditionalCtxAttributes());
     engine = new RuntimeInstance();
